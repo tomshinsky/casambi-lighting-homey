@@ -1,0 +1,45 @@
+<main class="homey-form">
+  <h1 class="homey-title">Connect an existing Casambi network</h1>
+  <p>Choose a saved network or a nearby device. One-time online setup downloads authorized network keys and light profiles. After setup, lighting control stays local.</p>
+  <label class="homey-form-label" for="network">Network or nearby device</label>
+  <select class="homey-form-input" id="network"></select>
+  <button class="homey-button-secondary" id="scan">Scan again</button>
+  <label class="homey-form-label" for="password">Casambi network password (not your account password)</label>
+  <input class="homey-form-input" id="password" type="password" autocomplete="off">
+  <p><label><input id="consent" type="checkbox"> Allow one-time contact with Casambi to authorize this network</label></p>
+  <p><label><input id="channels" type="checkbox"> Also offer separate channel devices</label></p>
+  <p>Channel devices share the same light and connection. Colour temperature applies to the whole luminaire.</p>
+  <button class="homey-button-primary" id="next">Continue</button>
+  <hr>
+  <label class="homey-form-label" for="file">Or import an authorized offline network export</label>
+  <input id="file" type="file" accept="application/json,.json">
+  <button class="homey-button-secondary" id="import">Import and continue</button>
+  <p id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+const element=id=>document.getElementById(id);
+let busy=false;
+async function task(operation) {
+  if(busy)return;busy=true;
+  for(const id of ['scan','next','import'])element(id).disabled=true;
+  element('status').textContent='Please wait…';
+  try {await operation();} catch(error) {element('status').textContent=error.message || 'Setup failed';}
+  finally {busy=false;for(const id of ['scan','next','import'])element(id).disabled=false;element('password').value='';}
+}
+async function scan() {
+  const entries=await Homey.emit('networks');element('network').replaceChildren();
+  for(const entry of entries) {const option=document.createElement('option');option.value=entry.id;option.textContent=entry.name;element('network').appendChild(option);}
+  element('status').textContent=entries.length?'Select an entry to continue.':'No nearby devices found. You can try again or import an offline export.';
+}
+element('scan').addEventListener('click',()=>task(scan));
+element('next').addEventListener('click',()=>task(async()=>{
+  const result=await Homey.emit('authorize',{selection:element('network').value,password:element('password').value,consent:element('consent').checked,channels:element('channels').checked});
+  if(result.skipped.length) await Homey.alert(`${result.skipped.length} unsupported fixtures were skipped. P0 supports dimmable lighting and CCT only.`);
+  await Homey.showView('list_devices');
+}));
+element('import').addEventListener('click',()=>task(async()=>{
+  const file=element('file').files[0];if(!file || file.size>2000000)throw new Error('Select a JSON export smaller than 2 MB');
+  await Homey.emit('import',{text:await file.text(),channels:element('channels').checked});element('file').value='';await Homey.showView('list_devices');
+}));
+Homey.ready();task(scan);
+</script>

@@ -1,0 +1,179 @@
+{
+  "id": "com.tomshinsky.casambi-lighting",
+  "version": "0.2.0",
+  "sdk": 3,
+  "runtime": "nodejs",
+  "compatibility": ">=12.9.0",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Casambi Lighting"
+  },
+  "description": {
+    "en": "Bring direct local control to your lighting"
+  },
+  "category": [
+    "lights"
+  ],
+  "permissions": [
+    "homey:wireless:ble"
+  ],
+  "author": {
+    "name": "Mike Tomshinsky"
+  },
+  "brandColor": "#243A40",
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png"
+  },
+  "drivers": [
+    {
+      "id": "casambi-light",
+      "name": {
+        "en": "Casambi light"
+      },
+      "class": "light",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "ble"
+      ],
+      "capabilities": [
+        "onoff",
+        "dim",
+        "button.reconnect"
+      ],
+      "capabilitiesOptions": {
+        "onoff": {
+          "setOnDim": false
+        },
+        "button.reconnect": {
+          "maintenanceAction": true,
+          "title": {
+            "en": "Reconnect network"
+          },
+          "desc": {
+            "en": "Refresh the Bluetooth connection shared by this network."
+          }
+        }
+      },
+      "images": {
+        "small": "/drivers/casambi-light/assets/images/small.png",
+        "large": "/drivers/casambi-light/assets/images/large.png"
+      },
+      "pair": [
+        {
+          "id": "setup"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "prev": "setup",
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    }
+  ],
+  "flow": {
+    "actions": [
+      {
+        "id": "set_channel",
+        "title": {
+          "en": "Set channel brightness"
+        },
+        "titleFormatted": {
+          "en": "Set channel [[channel]] to [[brightness]]%"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=casambi-light"
+          },
+          {
+            "name": "channel",
+            "type": "number",
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "placeholder": {
+              "en": "Channel"
+            }
+          },
+          {
+            "name": "brightness",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "Brightness (%)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "set_kelvin",
+        "title": {
+          "en": "Set colour temperature"
+        },
+        "titleFormatted": {
+          "en": "Set colour temperature to [[kelvin]] K"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=casambi-light&capabilities=light_temperature"
+          },
+          {
+            "name": "kelvin",
+            "type": "number",
+            "min": 1000,
+            "max": 20000,
+            "step": 50,
+            "placeholder": {
+              "en": "Kelvin"
+            }
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "id": "became_available",
+        "title": {
+          "en": "The light became available"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=casambi-light"
+          }
+        ]
+      },
+      {
+        "id": "became_unavailable",
+        "title": {
+          "en": "The light became unavailable"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=casambi-light"
+          }
+        ]
+      }
+    ]
+  }
+}

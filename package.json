@@ -1,0 +1,19 @@
+{
+  "name": "casambi-lighting-homey",
+  "version": "0.2.0",
+  "description": "Independent local Casambi lighting for Homey Pro",
+  "license": "Apache-2.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "lint": "eslint .",
+    "check": "npm run lint && npm test",
+    "validate": "homey app validate --level publish"
+  },
+  "devDependencies": {
+    "eslint": "10.12.0"
+  }
+}
