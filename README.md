@@ -59,6 +59,22 @@ its devices and Flows are not automatically migrated or deleted.
 
 ## Pair an existing network
 
+First prepare the light in the official Casambi app: power it, add it to an
+**Evolution** network if it is new, and verify on/off and dimming there. Keep an
+existing working network; Homey does not commission, reset or unpair the light.
+For this P0 online wizard, an administrator opens **More → Network setup → Sharing
+settings**, selects **Password protected**, and adds a password with **User** access
+for lighting control. Save and allow synchronization with Casambi while online.
+Do not select Open. Administrator-only email/password login is not implemented by
+this wizard; use an authorized export if sharing must remain unchanged.
+Keep the light powered in Homey's Bluetooth range and close the phone's Casambi
+app during pairing to reduce competing connections. Homey needs internet only for
+the online authorization step; an existing saved bundle works locally.
+
+[Пошаговая инструкция на русском](docs/SETUP.ru.md).
+Preparation references: [first use](https://docs.casambi.com/casambi-app/user-guide/first-time-use/)
+and [sharing modes](https://support.casambi.com/support/solutions/articles/12000017044).
+
 1. In Homey choose Add device → Casambi Lighting → Casambi light.
 2. Select a nearby Casambi device or an already saved network. Scanning is bounded
    and cached; no MAC address or key needs to be typed.
@@ -71,7 +87,7 @@ its devices and Flows are not automatically migrated or deleted.
 The setup service downloads credentials, inventory and fixture profiles. It is
 never called by the runtime connection manager. Passwords and setup-session tokens
 are discarded, while only the local-control bundle is retained on the hub.
-Administrator-only networks can be invisible to the bootstrap lookup. If setup
+Administrator-only email/password login is not implemented; those networks can be invisible to the bootstrap lookup. If setup
 fails, do not reset the network: inspect sharing in the official app or use the
 [offline export format](docs/OFFLINE-EXPORT.md). Fully local key derivation has not
 been demonstrated. An authorized initial export is therefore an explicit prerequisite.

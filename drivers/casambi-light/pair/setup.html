@@ -1,11 +1,20 @@
 <main class="homey-form">
   <h1 class="homey-title">Connect an existing Casambi network</h1>
   <p>Choose a saved network or a nearby device. One-time online setup downloads authorized network keys and light profiles. After setup, lighting control stays local.</p>
+  <details><summary>Prepare your light before adding it</summary>
+    <ol>
+      <li>Power the light and add it to an Evolution network in the official Casambi app. Check that you can control it there. Keep an existing working network; no reset or unpairing is needed.</li>
+      <li>For this P0 online setup, an administrator must open More → Network setup → Sharing settings and use Password protected sharing. Add a User password for lighting control and save/synchronize the changes while online. Administrator-only lookup is not supported by this wizard.</li>
+      <li>Keep the light powered within Bluetooth range of Homey. Close the Casambi app during pairing to avoid competing connections, then scan here.</li>
+    </ol>
+    <p>Enter the network User password below, not an email login, account password or Bluetooth PIN. You do not need to make the network Open. An authorized offline export is an alternative to online setup.</p>
+  </details>
   <label class="homey-form-label" for="network">Network or nearby device</label>
   <select class="homey-form-input" id="network"></select>
   <button class="homey-button-secondary" id="scan">Scan again</button>
   <label class="homey-form-label" for="password">Casambi network password (not your account password)</label>
   <input class="homey-form-input" id="password" type="password" autocomplete="off">
+  <p id="credential-help">Required only for a new network. Sent to Casambi over HTTPS once; not saved. Local-control keys remain in private storage on Homey. A saved network needs no password.</p>
   <p><label><input id="consent" type="checkbox"> Allow one-time contact with Casambi to authorize this network</label></p>
   <p><label><input id="channels" type="checkbox"> Also offer separate channel devices</label></p>
   <p>Channel devices share the same light and connection. Colour temperature applies to the whole luminaire.</p>
@@ -19,6 +28,11 @@
 <script>
 const element=id=>document.getElementById(id);
 let busy=false;
+function credentials() {
+  const saved=element('network').value.startsWith('saved:');
+  element('password').disabled=saved;element('consent').disabled=saved;
+  if(saved){element('password').value='';element('consent').checked=false;}
+}
 async function task(operation) {
   if(busy)return;busy=true;
   for(const id of ['scan','next','import'])element(id).disabled=true;
@@ -33,6 +47,7 @@ async function scan() {
   if(result.error)throw new Error(result.error);
   const entries=result.entries;element('network').replaceChildren();
   for(const entry of entries) {const option=document.createElement('option');option.value=entry.id;option.textContent=entry.name;element('network').appendChild(option);}
+  credentials();
   element('status').textContent=entries.length?'Select an entry to continue.':'No nearby devices found. You can try again or import an offline export.';
 }
 async function setupResult() {
@@ -41,8 +56,10 @@ async function setupResult() {
   if(result.error)throw new Error(result.error);return result.result;
 }
 element('scan').addEventListener('click',()=>task(scan));
+element('network').addEventListener('change',credentials);
 element('next').addEventListener('click',()=>task(async()=>{
-  await Homey.emit('authorize',{selection:element('network').value,password:element('password').value,consent:element('consent').checked,channels:element('channels').checked});
+  const request=Homey.emit('authorize',{selection:element('network').value,password:element('password').value,consent:element('consent').checked,channels:element('channels').checked});
+  element('password').value='';await request;
   const result=await setupResult();
   if(result.skipped.length) await Homey.alert(`${result.skipped.length} unsupported fixtures were skipped. P0 supports dimmable lighting and CCT only.`);
   await Homey.showView('list_devices');

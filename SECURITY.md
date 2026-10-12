@@ -5,6 +5,13 @@ online authorization is optional and explicit; the offline import path makes no
 network requests. Setup passwords/tokens are not persisted. Network keys and fixture
 profiles are stored in app-private owner-only files, outside the repository.
 
+The pairing password field is masked and cleared immediately after submission.
+Saved networks bypass password authorization. Passwords exist transiently in browser,
+Homey and HTTPS request memory; JavaScript cannot guarantee memory zeroization.
+Never send credentials in chat or attach exports to issues. Development caches and
+exports are separate from runtime storage and should be deleted after provisioning.
+Deleting local files does not erase chat history, cloud backups or filesystem snapshots.
+
 The implementation checks AES-CMAC, the peer's keyed authentication digest,
 authentication type/key ID and increasing receive counters. It does not disable
 authentication for unknown firmware. Nonces, keys, packets, device addresses and
