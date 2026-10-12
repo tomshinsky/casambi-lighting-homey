@@ -6,6 +6,7 @@ const {Scanner} = require('./lib/ble/scanner');
 const {safeEvent} = require('./lib/utils/logger');
 module.exports = class LightingApp extends Homey.App {
   async onInit() {
+    this.registryTail=Promise.resolve();this.stopping=false;
     this.networks=new Map();this.references=new Map();this.vault=new Vault();
     this.ready=this.vault.load();await this.ready;
     this.scanner=new Scanner(this.homey.ble);
@@ -21,7 +22,12 @@ module.exports = class LightingApp extends Homey.App {
     this.history=[...(this.history || []),sanitized].slice(-30);
     this.homey.settings.set('diagnostics',this.history);
   }
-  async acquire(id,reference) {
+  serial(operation) {
+    const task=this.registryTail.then(operation);this.registryTail=task.catch(()=>{});return task;
+  }
+  acquire(id,reference) {return this.serial(()=>this.acquireLocked(id,reference));}
+  async acquireLocked(id,reference) {
+    if(this.stopping) throw new Error('Application is stopping');
     await this.ready;
     if(!this.networks.has(id)) {
       const entry=this.vault.get(id);
@@ -34,17 +40,19 @@ module.exports = class LightingApp extends Homey.App {
     this.references.get(id).add(reference);
     const network=this.networks.get(id);
     // Device initialization returns before notification-driven work starts.
-    this.homey.setTimeout(()=>{if(this.references.get(id)?.size) network.start();},100);
+    this.homey.setTimeout(()=>{if(this.networks.get(id)===network && this.references.get(id)?.size) network.start();},100);
     return network;
   }
-  async release(id,reference) {
+  release(id,reference) {return this.serial(()=>this.releaseLocked(id,reference));}
+  async releaseLocked(id,reference) {
     const refs=this.references.get(id);refs?.delete(reference);
     if(refs && !refs.size) {await this.networks.get(id)?.stop();this.networks.delete(id);this.references.delete(id);}
   }
-  async replace(bundle) {
+  replace(bundle) {return this.serial(()=>this.replaceLocked(bundle));}
+  async replaceLocked(bundle) {
     const active=this.networks.get(bundle.id);
     if(active) await active.reconfigure(bundle);
     await this.vault.put(bundle);
   }
-  async onUninit() {clearTimeout(this.saveTimer);await Promise.all([...this.networks.values()].map(n=>n.stop()));await this.vault.save();}
+  async onUninit() {this.stopping=true;clearTimeout(this.saveTimer);await this.serial(async()=>{await Promise.all([...this.networks.values()].map(n=>n.stop()));await this.vault.save();});}
 };
