@@ -1,4 +1,4 @@
-# v0.2.0-p0-test — draft prerelease notes
+# v0.2.0-p0-test — prerelease notes
 
 Independent local Casambi lighting for Homey Pro. P0 provides authenticated BLE
 control, profile-based dimming/CCT, optional channel devices, shared network
@@ -19,4 +19,4 @@ Fresh online authorization through the JavaScript wizard and the mobile pairing 
 remain unverified on live hardware. The reference installation used an authorized
 offline import. Additional acceptance gaps include lamp power interruption, multiple
 physical luminaires, official-app coexistence and a 24-hour soak. Start with the
-[first-time setup guide](SETUP.md) and do not treat this prerelease as Store-certified.
+[first-time setup guide](https://github.com/tomshinsky/casambi-lighting-homey/blob/main/docs/SETUP.md) and do not treat this prerelease as Store-certified.

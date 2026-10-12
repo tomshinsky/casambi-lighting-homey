@@ -3,27 +3,29 @@
 ## Current gates
 
 - Local Git repository initialized; protocol, pairing and reliability changes are
-  split into descriptive commits. No remote repository has been created.
+  split into descriptive commits. The public repository was created with explicit owner approval.
 - Runtime contains no hardcoded credentials or live network/device identifiers.
 - Lint, automated tests and Homey `publish` validation pass locally.
 - Reference-lamp controls, parent/channel synchronization, Flow actions and BLE
   recovery pass hardware tests. See HARDWARE.md for exact scope.
 - Multi-luminaire hardware, fresh live JS online wizard, mobile UI, lamp power loss,
   official-app coexistence and days-long stability remain manual acceptance gates.
-- GitHub CI is prepared but has not run remotely. No claim of remote CI success.
+- GitHub CI runs on Node 22 and 24. Check the release commit in the Actions tab;
+  publication of a prerelease requires both jobs to pass.
 
-## Proposed GitHub release
+## GitHub test release
 
-Repository: `tomshinsky/casambi-lighting-homey` (not yet created).
+Repository: [tomshinsky/casambi-lighting-homey](https://github.com/tomshinsky/casambi-lighting-homey).
 Title: **Casambi Lighting for Homey Pro**.
-Visibility: public only after explicit owner approval.
+Visibility: public; explicitly approved by the owner on 2026-10-12.
 Initial tag: `v0.2.0-p0-test`, clearly marked prerelease.
 Do not publish private exports, old workspace diagnostics, hub identifiers or logs.
 Use the sanitized repository archive only. The installed GitHub connector identifies
 the intended account; GitHub CLI is not installed in the development environment.
 
-After approval, create the repository, push the reviewed history and run CI before
-publishing a prerelease. Keep the installation/compatibility caveats in release notes.
+The reviewed development snapshots were uploaded as six descriptive commits via
+the GitHub connector. Public commit IDs differ from the local development IDs;
+the final source tree was verified identical. Run CI before publishing a prerelease. Keep the installation/compatibility caveats in release notes.
 No workflow automatically uploads to the Store or creates a release.
 
 ## Homey App Store preparation
