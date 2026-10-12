@@ -27,19 +27,29 @@ async function task(operation) {
   finally {busy=false;for(const id of ['scan','next','import'])element(id).disabled=false;element('password').value='';}
 }
 async function scan() {
-  const entries=await Homey.emit('networks');element('network').replaceChildren();
+  await Homey.emit('scan');
+  let result;
+  do {result=await Homey.emit('networks');if(result.pending) await new Promise(resolve=>setTimeout(resolve,500));} while(result.pending);
+  if(result.error)throw new Error(result.error);
+  const entries=result.entries;element('network').replaceChildren();
   for(const entry of entries) {const option=document.createElement('option');option.value=entry.id;option.textContent=entry.name;element('network').appendChild(option);}
   element('status').textContent=entries.length?'Select an entry to continue.':'No nearby devices found. You can try again or import an offline export.';
 }
+async function setupResult() {
+  let result;
+  do {result=await Homey.emit('setup_status');if(result.pending)await new Promise(resolve=>setTimeout(resolve,500));} while(result.pending);
+  if(result.error)throw new Error(result.error);return result.result;
+}
 element('scan').addEventListener('click',()=>task(scan));
 element('next').addEventListener('click',()=>task(async()=>{
-  const result=await Homey.emit('authorize',{selection:element('network').value,password:element('password').value,consent:element('consent').checked,channels:element('channels').checked});
+  await Homey.emit('authorize',{selection:element('network').value,password:element('password').value,consent:element('consent').checked,channels:element('channels').checked});
+  const result=await setupResult();
   if(result.skipped.length) await Homey.alert(`${result.skipped.length} unsupported fixtures were skipped. P0 supports dimmable lighting and CCT only.`);
   await Homey.showView('list_devices');
 }));
 element('import').addEventListener('click',()=>task(async()=>{
   const file=element('file').files[0];if(!file || file.size>2000000)throw new Error('Select a JSON export smaller than 2 MB');
-  await Homey.emit('import',{text:await file.text(),channels:element('channels').checked});element('file').value='';await Homey.showView('list_devices');
+  await Homey.emit('import',{text:await file.text(),channels:element('channels').checked});element('file').value='';await setupResult();await Homey.showView('list_devices');
 }));
 Homey.ready();task(scan);
 </script>

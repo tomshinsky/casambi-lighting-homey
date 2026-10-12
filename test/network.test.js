@@ -31,3 +31,14 @@ test('duplicate commands are suppressed; offline and stale state reject writes',
   network.states.get(1).receivedAt=0;await assert.rejects(network.set(1,'dim',0.2),/stale/);
   network.accept({id:2,online:false,state:Buffer.alloc(4)});await assert.rejects(network.set(2,'dim',0.2),/unavailable/);await network.stop();
 });
+test('channel power restores its own previous level while another channel stays on',async()=>{
+  const {network}=setup();await ready(network);
+  try {await network.set(1,'onoff',false,0);assert.equal(network.status(1).state[0],0);await network.set(1,'onoff',true,0);assert.deepEqual(network.status(1).state,Buffer.from([200,100,50,3]));}
+  finally{await network.stop();}
+});
+test('reauthorization preserves listeners and IDs while reconnecting',async()=>{
+  const {network,sessions}=setup();await ready(network);
+  await network.reconfigure({...bundle,keyHex:'02'.repeat(16)});
+  while(!network.status(1).available)await once(network,'state');
+  assert.equal(sessions.length,2);assert.equal(network.bundle.keyHex,'02'.repeat(16));await network.stop();
+});

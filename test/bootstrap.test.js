@@ -28,3 +28,10 @@ test('offline import rejects duplicate units, unsupported capabilities and bad k
   assert.throws(()=>validateBundle({...bundle,keyHex:'invalid'}));
   assert.throws(()=>validateBundle({...bundle,units:[bundle.units[0],bundle.units[0]]}));
 });
+test('verified BLE proxy is independent from mesh-unit addresses',()=>{
+  const validated=validateBundle({...bundle,proxies:['00000000aaaa'],units:bundle.units.map(u=>({...u,address:'00000000bbbb'}))});
+  assert.deepEqual(validated.proxies,['00000000aaaa']);assert.equal(validated.units[0].address,undefined);
+});
+test('exports cannot silently treat unit addresses as BLE proxies',()=>{
+  const value={...bundle};delete value.proxies;assert.throws(()=>validateBundle(value),/proxies/);
+});

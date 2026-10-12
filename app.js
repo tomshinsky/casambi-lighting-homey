@@ -26,7 +26,7 @@ module.exports = class LightingApp extends Homey.App {
     if(!this.networks.has(id)) {
       const entry=this.vault.get(id);
       const network=new Network(this.homey.ble,entry.bundle,{memory:entry.memory,log:(event,fields)=>this.record(event,fields),saveMemory:memory=>{
-        entry.memory=memory;
+        this.vault.get(id).memory=memory;
         clearTimeout(this.saveTimer);this.saveTimer=setTimeout(()=>this.vault.save().catch(()=>this.record('storage_failed')),500);
       }});
       this.networks.set(id,network);this.references.set(id,new Set());
@@ -43,7 +43,7 @@ module.exports = class LightingApp extends Homey.App {
   }
   async replace(bundle) {
     const active=this.networks.get(bundle.id);
-    if(active) throw new Error('Remove devices for this network before replacing its authorization');
+    if(active) await active.reconfigure(bundle);
     await this.vault.put(bundle);
   }
   async onUninit() {clearTimeout(this.saveTimer);await Promise.all([...this.networks.values()].map(n=>n.stop()));await this.vault.save();}
