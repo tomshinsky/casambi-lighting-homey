@@ -1,0 +1,10 @@
+node_modules/
+.homeybuild/
+env.json
+.env*
+*.log
+coverage/
+private/
+*credentials*.json
+*network-export*.json
+.DS_Store

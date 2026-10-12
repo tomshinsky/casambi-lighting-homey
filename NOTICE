@@ -1,0 +1,11 @@
+Casambi Lighting for Homey Pro
+Independent community project; not affiliated with Casambi Technologies Oy, Flos or Athom.
+
+The encryption and wire protocol implementation is a JavaScript adaptation of
+lkempf/casambi-bt (Lukas Kempf and contributors), Apache License 2.0.
+Reference revision ec23769ab3459abf8ba5f332267900964319d03e.
+Adaptations include Homey BLE transport, early notification registration,
+server digest and counter verification, generic bitfield profiles and shared
+network connection management. Preserve this notice in redistributions.
+
+No code from other Home Assistant integrations is included.
