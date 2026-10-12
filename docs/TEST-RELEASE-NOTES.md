@@ -14,3 +14,9 @@ This is a test candidate. Review the README, compatibility matrix and manual tes
 before installation. The notification workaround uses a private Homey SDK field.
 Please report compatibility with versions and sanitized events only; never upload
 keys, network exports, live identifiers or raw diagnostic archives.
+
+Fresh online authorization through the JavaScript wizard and the mobile pairing UI
+remain unverified on live hardware. The reference installation used an authorized
+offline import. Additional acceptance gaps include lamp power interruption, multiple
+physical luminaires, official-app coexistence and a 24-hour soak. Start with the
+[first-time setup guide](SETUP.md) and do not treat this prerelease as Store-certified.

@@ -21,7 +21,7 @@ through real Homey pairing handlers. One parent and two channel devices were cre
 | Master dim retaining channel ratio | Passed |
 | CCT and synchronization across parent/children | Passed |
 | Device-scoped channel and Kelvin Flow actions | Passed |
-| Shared BLE reconnect and all three devices available | Passed, 6.781 seconds |
+| Shared BLE reconnect and all three devices available | Passed, 6.781 seconds initially; 6.217 seconds on repeat verification |
 | Original observed state restored after control tests | Passed |
 | Full Homey reboot recovery | Passed, 71.364 seconds; observed hub offline, then all three devices reauthenticated and available |
 | Physical upper/lower mapping | Pending visual observation |
@@ -36,3 +36,7 @@ found by hardware testing, not by assuming the inventory schema implied BLE iden
 
 Automated tests use synthetic profiles, addresses, keys and sessions. They exercise
 multiple units and failure modes but cannot certify another manufacturer or firmware.
+
+After the pairing-help update, all twelve hardware checks were repeated successfully,
+including both channels, power memory, CCT, Flow, reconnect and original-state
+restoration. All three registered devices were available before the repeat test.

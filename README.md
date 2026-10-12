@@ -71,7 +71,7 @@ Keep the light powered in Homey's Bluetooth range and close the phone's Casambi
 app during pairing to reduce competing connections. Homey needs internet only for
 the online authorization step; an existing saved bundle works locally.
 
-[Пошаговая инструкция на русском](docs/SETUP.ru.md).
+[Complete first-time setup guide](docs/SETUP.md).
 Preparation references: [first use](https://docs.casambi.com/casambi-app/user-guide/first-time-use/)
 and [sharing modes](https://support.casambi.com/support/solutions/articles/12000017044).
 
